@@ -240,18 +240,3 @@ SELECT spcname, pg_tablespace_location(oid)
 FROM pg_tablespace
 ORDER BY spcname;
 EOF
-
-echo
-psql -h localhost -p "$PGPORT" -U "$DB_USER" -d "$DB_NAME" <<'EOF'
-SELECT
-    c.relkind,
-    c.relname AS object_name,
-    COALESCE(t.spcname, 'pg_default') AS tablespace_name,
-    n.nspname AS schema_name
-FROM pg_class c
-JOIN pg_namespace n ON n.oid = c.relnamespace
-LEFT JOIN pg_tablespace t ON t.oid = c.reltablespace
-WHERE n.nspname NOT IN ('pg_catalog', 'information_schema')
-  AND c.relkind IN ('r', 'i')
-ORDER BY tablespace_name, c.relkind, object_name;
-EOF
